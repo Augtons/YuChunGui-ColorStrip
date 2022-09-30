@@ -1,3 +1,4 @@
+# For Github CMake Project Template
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -9,3 +10,9 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# For CLion
+/cmake-build-debug
+
+# For ESP-IDF
+/build
