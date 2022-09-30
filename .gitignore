@@ -12,6 +12,7 @@ CTestTestfile.cmake
 _deps
 
 # For CLion
+.idea
 /cmake-build-debug
 
 # For ESP-IDF
