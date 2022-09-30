@@ -26,16 +26,38 @@ struct ws2812_strip_t {
 };
 
 struct ws2812_config_t {
-    rmt_channel_t   rmt_channel;
-    gpio_num_t      gpio;
-    uint32_t        led_num;
+    rmt_channel_t   rmt_channel; /* RMT channel for the strip */
+    gpio_num_t      gpio;        /* GPIO which connected to the strip. */
+    uint32_t        led_num;     /* Count of LEDs. Determines how much memory to be allocated. */
 };
 
 typedef struct ws2812_strip_t ws2812_strip_t;
 typedef struct ws2812_config_t ws2812_config_t;
 
+/**
+ * @brief A sample function to initialize RMT device for ws2812 strip.
+ *
+ * @param channel       [in] RMT channel to initialize.
+ * @param gpio          [out] GPIO to use.
+ *
+ * @return ESP_OK success
+ *
+ * @author Augtons
+ */
 esp_err_t ws2812_rmt_init(uint8_t channel, gpio_num_t gpio);
 
+/**
+ * @briefCreate Create a ws2812 led_strip instance.
+ *
+ * @param config        [in]  configuration of it.
+ * @param ret_led_strip [out] led_strip object which were created.
+ *
+ * @return
+ *   - ESP_OK succeed
+ *   - Other  failed
+ *
+ * @Author Augtons
+ */
 esp_err_t led_strip_create_ws2812(ws2812_config_t *config, led_strip_t **ret_led_strip);
 
 #endif //YUCHUNGUI_COLORSTRIP2_LED_STRIP_IMPL_WS2812_H

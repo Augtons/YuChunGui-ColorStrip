@@ -66,7 +66,7 @@ static esp_err_t ws2812_set_color(
     ws2812_strip_t *strip = __containerof(led_strip, ws2812_strip_t, parent);
 
     if (index > strip->led_num) {
-        ESP_LOGE("WS2812", "%d > %d", index, strip->led_num);
+        ESP_LOGE(TAG, "The index of led you provided `%d`, is better than strip length `%d`", index, strip->led_num);
         return ESP_ERR_INVALID_SIZE;
     }
 

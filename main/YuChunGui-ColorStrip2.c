@@ -15,9 +15,9 @@ void app_main(void)
         .gpio = GPIO_NUM_7
     };
 
-    led_strip_create_ws2812(&strip_config, &strip);
-
     uint32_t colors[12][3] = {0};
+
+    led_strip_create_ws2812(&strip_config, &strip);
 
     bool direction = 1;
     uint32_t light = 10;
@@ -30,6 +30,10 @@ void app_main(void)
 
         if (light >= 50) {
             direction = 0;
+//            led_strip_delete(strip);
+//            ws2812_rmt_init(RMT_CHANNEL_0, GPIO_NUM_7);
+//            led_strip_create_ws2812(&strip_config, &strip);
+            ESP_LOGI("msd", "Remalloc led strip ws2812");
         } else if (light <= 10) {
             direction = 1;
         }
