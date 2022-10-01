@@ -2,8 +2,8 @@
 // Created by Augtons on 2022/9/29.
 //
 
-#ifndef YUCHUNGUI_COLORSTRIP2_LED_STRIP_IMPL_WS2812_H
-#define YUCHUNGUI_COLORSTRIP2_LED_STRIP_IMPL_WS2812_H
+#ifndef _LED_STRIP_IMPL_WS2812_H
+#define _LED_STRIP_IMPL_WS2812_H
 
 #include "string.h"
 
@@ -60,4 +60,4 @@ esp_err_t ws2812_rmt_init(uint8_t channel, gpio_num_t gpio);
  */
 esp_err_t led_strip_create_ws2812(ws2812_config_t *config, led_strip_t **ret_led_strip);
 
-#endif //YUCHUNGUI_COLORSTRIP2_LED_STRIP_IMPL_WS2812_H
+#endif //_LED_STRIP_IMPL_WS2812_H
