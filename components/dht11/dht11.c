@@ -7,7 +7,6 @@
 static const char *TAG = "DHT11";
 
 static esp_err_t wait_for_gpio_level_change(const gpio_num_t gpio, const uint8_t current_level, const uint32_t timeout) {
-    if (timeout < 0) { return ESP_ERR_INVALID_ARG; }
     uint64_t timeout_time = esp_timer_get_time() + timeout;
 
     while (gpio_get_level(gpio) == current_level) {
@@ -18,7 +17,7 @@ static esp_err_t wait_for_gpio_level_change(const gpio_num_t gpio, const uint8_t
     return ESP_OK;
 }
 
-esp_err_t dht11_create(gpio_num_t gpio, dht11_handle *ret_dht) {
+esp_err_t dht11_create(gpio_num_t gpio, dht11_handle_t *ret_dht) {
     dht11_t *dht11 = calloc(1, sizeof(dht11_t));
     dht11->gpio = gpio;
 
@@ -30,24 +29,23 @@ esp_err_t dht11_create(gpio_num_t gpio, dht11_handle *ret_dht) {
         .pull_down_en = false,
         .intr_type = GPIO_INTR_DISABLE
     };
-    gpio_config(&gpiocfg);
+    esp_err_t err = gpio_config(&gpiocfg);
+    if (err != ESP_OK) { return  err; }
 
     *ret_dht = dht11;
 
     return ESP_OK;
 }
 
-esp_err_t dht11_delete(dht11_handle dht11) {
+esp_err_t dht11_delete(dht11_handle_t dht11) {
     dht11_t *dht = dht11;
     free(dht);
     return ESP_OK;
 }
 
-esp_err_t dht11_read(dht11_handle dht11, float *temperature, float *humidity) {
+esp_err_t dht11_read(dht11_handle_t dht11, float *temperature, float *humidity) {
     dht11_t *dht = dht11;
     esp_err_t err = ESP_OK;
-
-    uint64_t mydata = 0;
 
     // 1. make a start signal.
     gpio_set_level(dht->gpio, 1);
@@ -56,9 +54,8 @@ esp_err_t dht11_read(dht11_handle dht11, float *temperature, float *humidity) {
     gpio_set_level(dht->gpio, 1);
 
     // 2. wait for ack signal.
-    esp_rom_delay_us(70); // 等待检测应答信号
+    esp_rom_delay_us(70);
     if (gpio_get_level(dht->gpio) == 1) {
-        // 未应答
         return ESP_ERR_TIMEOUT;
     }
 
@@ -76,14 +73,14 @@ esp_err_t dht11_read(dht11_handle dht11, float *temperature, float *humidity) {
         uint8_t buf = 0;
         for (int i = 0; i < 8; i++) {
             err = wait_for_gpio_level_change(dht->gpio, 0, 100);
-            ESP_RETURN_ON_ERROR(err, TAG, "Timeout");
+            ESP_RETURN_ON_ERROR(err, TAG, "Timeout when reading data.");
 
             uint64_t time = esp_timer_get_time() + 50;
             while (gpio_get_level(dht->gpio)) {
                 if (esp_timer_get_time() > time) {
                     buf |= 1 << (7 - i);
                     err = wait_for_gpio_level_change(dht->gpio, 1, 100);
-                    ESP_RETURN_ON_ERROR(err, TAG, "Timeout");
+                    ESP_RETURN_ON_ERROR(err, TAG, "Timeout when reading data.");
                     break;
                 }
             }
@@ -91,18 +88,27 @@ esp_err_t dht11_read(dht11_handle dht11, float *temperature, float *humidity) {
         byte[b] = buf;
     }
 
-    uint8_t humi_integer = byte[0];
-    uint8_t humi_decimal = byte[1];
-    uint8_t temp_integer = byte[2];
-    uint8_t temp_decimal = byte[3];
-    uint8_t jiaoyan = byte[4];
+    /*
+     * byte[0] is humidity integer
+     * byte[1] is humidity decimal
+     * byte[2] is temperature integer
+     * byte[3] is temperature decimal
+     * byte[4] is crc
+     */
 
-    if ((uint8_t)(humi_integer + humi_decimal + temp_integer + temp_decimal) != jiaoyan) {
+    float humi_decimal_float = byte[1];
+    float temp_decimal_float = byte[3];
+
+    while (humi_decimal_float /= 10, humi_decimal_float >= 1);
+    while (temp_decimal_float /= 10, temp_decimal_float >= 1);
+
+    if ((uint8_t)(byte[0] + byte[1] + byte[2] + byte[3]) != byte[4]) {
+        ESP_LOGW(TAG, "CRC check failed. Data: %X-%X-%X-%X => %X", byte[0], byte[1], byte[2], byte[3], byte[4]);
         return ESP_ERR_INVALID_STATE;
     }
 
-    *temperature = (float)temp_integer;
-    *humidity = (float)humi_integer;
+    *temperature = (float)byte[2] + roundf(temp_decimal_float * 10) / 10;
+    *humidity = (float)byte[0] + roundf(humi_decimal_float * 10 / 10);
 
     return ESP_OK;
 }

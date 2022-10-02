@@ -5,6 +5,7 @@
 #ifndef _DHT11_H
 #define _DHT11_H
 
+#include "math.h"
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_check.h"
@@ -18,12 +19,42 @@ struct dht11_t {
 
 typedef struct dht11_t dht11_t;
 
-typedef void *dht11_handle;
+typedef void *dht11_handle_t;
 
-esp_err_t dht11_create(gpio_num_t gpio, dht11_handle *ret_dht);
+/**
+ * @brief Create DHT11 sensor instance.
+ *
+ * @param gpio          GPIO to use.
+ * @param ret_dht[out]  DHT11 instance created.
+ *
+ * @return
+ *  - ESP_OK succeed
+ *  - Others failed
+ */
+esp_err_t dht11_create(gpio_num_t gpio, dht11_handle_t *ret_dht);
 
-esp_err_t dht11_delete(dht11_handle dht11);
+/**
+ * @brief Delete DHT11 sensor instance.
+ *
+ * @param dht11     DHT11 instance to delete.
+ *
+ * @return
+ *  - ESP_OK succeed
+ */
+esp_err_t dht11_delete(dht11_handle_t dht11);
 
-esp_err_t dht11_read(dht11_handle dht11, float *temperature, float *humidity);
+/**
+ * @brief Read temperature and humidity data from DHT11 instance.
+ *
+ * @param dht11              DHT11 instance
+ * @param temperature [out]  The obtained temperature data.
+ * @param humidity    [out]  The obtained humidity data.
+ *
+ * @return
+ *  - ESP_OK                Succeed
+ *  - ESP_ERR_INVALID_STATE CRC check failed
+ *  - ESP_ERR_TIMEOUT       Timeout
+ */
+esp_err_t dht11_read(dht11_handle_t dht11, float *temperature, float *humidity);
 
 #endif //_DHT11_H

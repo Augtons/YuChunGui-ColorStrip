@@ -25,10 +25,7 @@ void app_main(void)
 
     led_strip_create_ws2812(&strip_config, &strip);
 
-    bool direction = 1;
-    uint32_t light = 10;
-
-    dht11_handle dht11 = NULL;
+    dht11_handle_t dht11 = NULL;
     dht11_create(GPIO_NUM_6, &dht11);
 
     float temp, humi;
@@ -58,7 +55,7 @@ void app_main(void)
         humi = 0;
         esp_err_t err = dht11_read(dht11, &temp, &humi);
 
-        ESP_LOGI("main", "temp = %f, humi = %f, err: %s", temp, humi, esp_err_to_name(err));
+        ESP_LOGI("main", "temp = %.2f, humi = %.2f, err: %s", temp, humi, esp_err_to_name(err));
 
     }
 
