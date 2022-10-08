@@ -5,7 +5,9 @@
 #include "ycg_blufi.h"
 #include "wifi_manager.h"
 
-ycg_wifi_manager_t ycg_wifi_manager;
+ycg_wifi_manager_t ycg_wifi_manager = {0};
+
+static const char* TAG = "YCG_WIFI";
 
 static void ycg_wifi_event_handler(void* arg, esp_event_base_t event_base,
                                int32_t event_id, void* event_data) {
@@ -133,32 +135,45 @@ static void ycg_ip_event_handler(void* arg, esp_event_base_t event_base,
 }
 
 void ycg_wifi_init() {
-    ycg_wifi_manager.netif_sta = esp_netif_create_default_wifi_sta();
-    assert(ycg_wifi_manager.netif_sta);
+    if (ycg_wifi_manager.wifi_inited == true) {
+        ESP_LOGW(TAG, "Wifi has been initialized");
+        return;
+    }
+    ycg_wifi_manager.wifi_inited = true;
 
-    ycg_wifi_manager.netif_ap = esp_netif_create_default_wifi_ap();
-    assert(ycg_wifi_manager.netif_ap);
+    if (ycg_wifi_manager.netif_sta == NULL) {
+        ycg_wifi_manager.netif_sta = esp_netif_create_default_wifi_sta();
+        assert(ycg_wifi_manager.netif_sta);
+    }
 
-    ESP_ERROR_CHECK(
-        esp_event_handler_instance_register(
-            WIFI_EVENT,
-            ESP_EVENT_ANY_ID,
-            ycg_wifi_event_handler,
-            NULL,
-            &ycg_wifi_manager.wifi_event_handler_ins
-        )
-    );
+    if (ycg_wifi_manager.netif_ap == NULL) {
+        ycg_wifi_manager.netif_ap = esp_netif_create_default_wifi_ap();
+        assert(ycg_wifi_manager.netif_ap);
+    }
 
-    ESP_ERROR_CHECK(
-        esp_event_handler_instance_register(
-            IP_EVENT,
-            ESP_EVENT_ANY_ID,
-            ycg_ip_event_handler,
-            NULL,
-            &ycg_wifi_manager.ip_event_handler_ins
-        )
-    );
+    if (ycg_wifi_manager.wifi_event_handler_ins == NULL) {
+        ESP_ERROR_CHECK(
+            esp_event_handler_instance_register(
+                WIFI_EVENT,
+                ESP_EVENT_ANY_ID,
+                ycg_wifi_event_handler,
+                NULL,
+                &ycg_wifi_manager.wifi_event_handler_ins
+            )
+        );
+    }
 
+    if (ycg_wifi_manager.ip_event_handler_ins) {
+        ESP_ERROR_CHECK(
+            esp_event_handler_instance_register(
+                IP_EVENT,
+                ESP_EVENT_ANY_ID,
+                ycg_ip_event_handler,
+                NULL,
+                &ycg_wifi_manager.ip_event_handler_ins
+            )
+        );
+    }
 
     wifi_init_config_t init_cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&init_cfg));

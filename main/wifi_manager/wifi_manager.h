@@ -10,6 +10,8 @@
 #include "esp_netif.h"
 
 struct ycg_wifi_manager_t {
+    bool wifi_inited;
+
     esp_netif_t *netif_sta;
     esp_netif_t *netif_ap;
 
