@@ -17,35 +17,13 @@ static esp_err_t wait_for_gpio_level_change(const gpio_num_t gpio, const uint8_t
     return ESP_OK;
 }
 
-esp_err_t dht11_create(gpio_num_t gpio, dht11_handle_t *ret_dht) {
-    dht11_t *dht11 = calloc(1, sizeof(dht11_t));
-    dht11->gpio = gpio;
-
-    gpio_pad_select_gpio(gpio);
-    gpio_config_t gpiocfg = {
-        .pin_bit_mask = BIT64(dht11->gpio),
-        .mode = GPIO_MODE_INPUT_OUTPUT_OD,
-        .pull_up_en = true,
-        .pull_down_en = false,
-        .intr_type = GPIO_INTR_DISABLE
-    };
-    esp_err_t err = gpio_config(&gpiocfg);
-    if (err != ESP_OK) { return  err; }
-
-    *ret_dht = dht11;
-
-    return ESP_OK;
-}
-
-esp_err_t dht11_delete(dht11_handle_t dht11) {
-    dht11_t *dht = dht11;
-    free(dht);
-    return ESP_OK;
-}
-
-esp_err_t dht11_read(dht11_handle_t dht11, float *temperature, float *humidity) {
+static esp_err_t dht11_read_impl(dht11_handle_t dht11, float *temperature, float *humidity) {
     dht11_t *dht = dht11;
     esp_err_t err = ESP_OK;
+
+    if (dht11 == NULL || temperature == NULL || humidity == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
 
     // 1. make a start signal.
     gpio_set_level(dht->gpio, 1);
@@ -111,4 +89,66 @@ esp_err_t dht11_read(dht11_handle_t dht11, float *temperature, float *humidity) 
     *humidity = (float)byte[0] + roundf(humi_decimal_float * 10 / 10);
 
     return ESP_OK;
+}
+
+esp_err_t dht11_create(gpio_num_t gpio, dht11_handle_t *ret_dht) {
+    if (!GPIO_IS_VALID_OUTPUT_GPIO(gpio) || ret_dht == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    dht11_t *dht11 = calloc(1, sizeof(dht11_t));
+    if (dht11 == NULL) {
+        return ESP_ERR_NO_MEM;
+    }
+
+    dht11->gpio = gpio;
+    dht11->lock = xSemaphoreCreateMutex();
+
+    gpio_pad_select_gpio(gpio);
+    gpio_config_t gpiocfg = {
+        .pin_bit_mask = BIT64(dht11->gpio),
+        .mode = GPIO_MODE_INPUT_OUTPUT_OD,
+        .pull_up_en = true,
+        .pull_down_en = false,
+        .intr_type = GPIO_INTR_DISABLE
+    };
+    esp_err_t err = gpio_config(&gpiocfg);
+    if (err != ESP_OK) {
+        free(dht11);
+        gpio_reset_pin(gpio);
+        return err;
+    }
+    *ret_dht = dht11;
+
+    return ESP_OK;
+}
+
+esp_err_t dht11_delete(dht11_handle_t dht11) {
+    if (dht11 == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    dht11_t *dht = dht11;
+    if (xSemaphoreTake(dht->lock, portMAX_DELAY) == pdTRUE) {
+        vSemaphoreDelete(dht->lock);
+        free(dht);
+    }
+    return ESP_OK;
+}
+
+esp_err_t dht11_read(dht11_handle_t dht11, float *temperature, float *humidity) {
+    dht11_t *dht = dht11;
+    esp_err_t err = ESP_OK;
+
+    if (dht == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
+
+    if (xSemaphoreTake(dht->lock, pdMS_TO_TICKS(10)) == pdTRUE) {
+        err = dht11_read_impl(dht11, temperature, humidity);
+        xSemaphoreGive(dht->lock);
+    } else {
+        err = ESP_ERR_TIMEOUT;
+    }
+
+    return err;
 }

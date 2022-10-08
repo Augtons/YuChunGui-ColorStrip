@@ -12,9 +12,11 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
 struct dht11_t {
     gpio_num_t gpio;
+    SemaphoreHandle_t lock;
 };
 
 typedef struct dht11_t dht11_t;
