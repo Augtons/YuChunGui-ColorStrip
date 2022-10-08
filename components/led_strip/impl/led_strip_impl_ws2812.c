@@ -63,6 +63,9 @@ static esp_err_t ws2812_set_color(
     uint32_t green,
     uint32_t blue
 ) {
+    if (led_strip == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
     ws2812_strip_t *strip = __containerof(led_strip, ws2812_strip_t, parent);
 
     if (index > strip->led_num) {
@@ -81,6 +84,9 @@ static esp_err_t ws2812_set_color(
 
 static esp_err_t ws2812_refresh(led_strip_t *led_strip, TickType_t timeout)
 {
+    if (led_strip == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
     esp_err_t err = ESP_OK;
     ws2812_strip_t *strip = __containerof(led_strip, ws2812_strip_t, parent);
     err = rmt_write_sample(strip->rmt_channel, strip->buffer, 3 * strip->led_num, true);
@@ -91,6 +97,9 @@ static esp_err_t ws2812_refresh(led_strip_t *led_strip, TickType_t timeout)
 }
 
 static esp_err_t ws2812_delete(led_strip_t *led_strip) {
+    if (led_strip == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
     ws2812_strip_t *strip = __containerof(led_strip, ws2812_strip_t, parent);
     rmt_driver_uninstall(strip->rmt_channel);
     free(strip);
@@ -98,6 +107,9 @@ static esp_err_t ws2812_delete(led_strip_t *led_strip) {
 }
 
 static esp_err_t ws2812_clear(led_strip_t *led_strip, TickType_t timeout) {
+    if (led_strip == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
     ws2812_strip_t *strip = __containerof(led_strip, ws2812_strip_t, parent);
     memset(strip->buffer, 0, 3 * strip->led_num);
     ws2812_refresh(led_strip, timeout);
@@ -120,6 +132,9 @@ esp_err_t ws2812_rmt_init(uint8_t channel, gpio_num_t gpio) {
 }
 
 esp_err_t led_strip_create_ws2812(ws2812_config_t *config, led_strip_t **ret_led_strip) {
+    if (config == NULL || ret_led_strip == NULL) {
+        return ESP_ERR_INVALID_ARG;
+    }
     esp_err_t err = ESP_OK;
     struct ws2812_config_t *ws2812Config = config;
     // malloc ws2812 strip type
