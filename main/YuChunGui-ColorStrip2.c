@@ -1,62 +1,31 @@
 #include <stdio.h>
+#include "esp_log.h"
+#include "esp_err.h"
+#include "esp_netif.h"
+#include "esp_event.h"
 
-#include "led_strip.h"
-#include "led_strip_impl_ws2812.h"
+#include "nvs_flash.h"
 
-#include "esp_task_wdt.h"
-
-#include "dht11.h"
+#include "wifi_manager/wifi_manager.h"
+#include "blufi/ycg_blufi.h"
 
 static const char* TAG = "MAIN";
 
-void app_main(void)
+void app_main()
 {
-    ws2812_rmt_init(RMT_CHANNEL_0, GPIO_NUM_7);
-
-    led_strip_t *strip = NULL;
-
-    ws2812_config_t strip_config = {
-        .rmt_channel = RMT_CHANNEL_0,
-        .led_num = 60,
-        .gpio = GPIO_NUM_7
-    };
-
-    uint32_t colors[12][3] = {0};
-
-    led_strip_create_ws2812(&strip_config, &strip);
-
-    dht11_handle_t dht11 = NULL;
-    dht11_create(GPIO_NUM_6, &dht11);
-
-    float temp, humi;
-
-    while (1) {
-
-//        for (int i = 0; i < 12; i++) {
-//            hsv2rgb(i * 30, 100, light, &colors[i][0], &colors[i][1], &colors[i][2]);
-//        }
-//
-//        if (light >= 20) {
-//            direction = 0;
-//        } else if (light <= 5) {
-//            direction = 1;
-//        }
-//
-//        direction ? light++ : light--;
-//
-//        for(int i = 0; i < 60; i++) {
-//            led_strip_set_color(strip, i, colors[i%12][0], colors[i%12][1], colors[i%12][2]);
-//        }
-//        led_strip_refresh(strip, 10);
-
-        vTaskDelay(pdMS_TO_TICKS(1000));
-
-        temp = 0;
-        humi = 0;
-        esp_err_t err = dht11_read(dht11, &temp, &humi);
-
-        ESP_LOGI("main", "temp = %.2f, humi = %.2f, err: %s", temp, humi, esp_err_to_name(err));
-
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
     }
+    ESP_ERROR_CHECK(ret);
+
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    ycg_wifi_init();
+    esp_blufi_set_host_name("john-xie");
+    ycg_blufi_init();
+
 
 }
