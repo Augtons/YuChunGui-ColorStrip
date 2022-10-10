@@ -1,8 +1,23 @@
-set(SUB_DIRS
+set(SINGLE_DIRS
     "." "blufi" "wifi_manager"
 )
 
+# Tencent Cloud SDK
+set(TENCENT_CLOUD_INCLUDE
+    "tencent_cloud/include"
+    "tencent_cloud/include/exports"
+    "tencent_cloud/sdk_src/internal_inc"
+)
+
+set(TENCENT_CLOUD_SRCS
+    "tencent_cloud/platform"
+    "tencent_cloud/sdk_src"
+)
+
+
 idf_component_register(
-    SRC_DIRS        ${SUB_DIRS}
-    INCLUDE_DIRS    ${SUB_DIRS}
+    SRC_DIRS
+        ${SINGLE_DIRS} ${TENCENT_CLOUD_SRCS}
+    INCLUDE_DIRS
+        ${SINGLE_DIRS} ${TENCENT_CLOUD_INCLUDE}
 )
