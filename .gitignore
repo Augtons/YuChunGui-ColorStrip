@@ -10,10 +10,12 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+CMakeProfile_*.cmake
 
 # For CLion
 .idea
-/cmake-build-debug
+/cmake-build-debug*
+.clion.source.upload.marker
 
 # For ESP-IDF
 /build

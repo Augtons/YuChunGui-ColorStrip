@@ -87,16 +87,6 @@ static void ycg_wifi_event_handler(void* arg, esp_event_base_t event_base,
             free(blufi_ap_list);
             break;
         }
-        case WIFI_EVENT_AP_STACONNECTED: {
-            wifi_event_ap_staconnected_t* event = (wifi_event_ap_staconnected_t*) event_data;
-            BLUFI_INFO("station "MACSTR" join, AID=%d", MAC2STR(event->mac), event->aid);
-            break;
-        }
-        case WIFI_EVENT_AP_STADISCONNECTED: {
-            wifi_event_ap_stadisconnected_t* event = (wifi_event_ap_stadisconnected_t*) event_data;
-            BLUFI_INFO("station "MACSTR" leave, AID=%d", MAC2STR(event->mac), event->aid);
-            break;
-        }
 
         default:
             break;
