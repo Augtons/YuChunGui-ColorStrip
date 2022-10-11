@@ -4,12 +4,15 @@ set(SINGLE_DIRS
 
 # Tencent Cloud SDK
 set(TENCENT_CLOUD_INCLUDE
+    "tencent_cloud"
     "tencent_cloud/include"
     "tencent_cloud/include/exports"
     "tencent_cloud/sdk_src/internal_inc"
+    "tencent_cloud/data_model"
 )
 
 set(TENCENT_CLOUD_SRCS
+    "tencent_cloud"
     "tencent_cloud/platform"
     "tencent_cloud/sdk_src"
 )

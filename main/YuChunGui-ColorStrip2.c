@@ -9,6 +9,8 @@
 #include "wifi_manager/wifi_manager.h"
 #include "blufi/ycg_blufi.h"
 
+#include "data_config.c"
+
 static const char* TAG = "MAIN";
 
 void app_main()
@@ -26,6 +28,4 @@ void app_main()
     ycg_wifi_init();
     esp_blufi_set_host_name("john-xie");
     ycg_blufi_init();
-
-
 }
