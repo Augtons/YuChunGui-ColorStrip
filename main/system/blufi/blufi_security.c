@@ -6,26 +6,16 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-#include "esp_bt.h"
-
-#include "esp_blufi_api.h"
-#include "blufi_example.h"
+#include "system.h"
 
 #include "mbedtls/aes.h"
 #include "mbedtls/dhm.h"
 #include "mbedtls/md5.h"
 #include "esp_crc.h"
+
+#include "ycg_blufi.h"
+
+static const char* TAG = "BLUFI_SEQURITY";
 
 /*
    The SEC_TYPE_xxx is for self-defined packet data type in the procedure of "BLUFI negotiate key"
@@ -70,7 +60,7 @@ void blufi_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_da
     uint8_t type = data[0];
 
     if (blufi_sec == NULL) {
-        BLUFI_ERROR("BLUFI Security is not initialized");
+        YCG_BLUFI_WARN("BLUFI Security is not initialized");
         btc_blufi_report_error(ESP_BLUFI_INIT_SECURITY_ERROR);
         return;
     }
@@ -85,13 +75,13 @@ void blufi_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_da
         blufi_sec->dh_param = (uint8_t *)malloc(blufi_sec->dh_param_len);
         if (blufi_sec->dh_param == NULL) {
             btc_blufi_report_error(ESP_BLUFI_DH_MALLOC_ERROR);
-            BLUFI_ERROR("%s, malloc failed\n", __func__);
+            YCG_BLUFI_ERROR("%s, malloc failed\n", __func__);
             return;
         }
         break;
     case SEC_TYPE_DH_PARAM_DATA:{
         if (blufi_sec->dh_param == NULL) {
-            BLUFI_ERROR("%s, blufi_sec->dh_param == NULL\n", __func__);
+            YCG_BLUFI_ERROR("%s, blufi_sec->dh_param == NULL\n", __func__);
             btc_blufi_report_error(ESP_BLUFI_DH_PARAM_ERROR);
             return;
         }
@@ -99,7 +89,7 @@ void blufi_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_da
         memcpy(blufi_sec->dh_param, &data[1], blufi_sec->dh_param_len);
         ret = mbedtls_dhm_read_params(&blufi_sec->dhm, &param, &param[blufi_sec->dh_param_len]);
         if (ret) {
-            BLUFI_ERROR("%s read param failed %d\n", __func__, ret);
+            YCG_BLUFI_ERROR("%s read param failed %d\n", __func__, ret);
             btc_blufi_report_error(ESP_BLUFI_READ_PARAM_ERROR);
             return;
         }
@@ -107,7 +97,7 @@ void blufi_dh_negotiate_data_handler(uint8_t *data, int len, uint8_t **output_da
         blufi_sec->dh_param = NULL;
         ret = mbedtls_dhm_make_public(&blufi_sec->dhm, (int) mbedtls_mpi_size( &blufi_sec->dhm.P ), blufi_sec->self_public_key, blufi_sec->dhm.len, myrand, NULL);
         if (ret) {
-            BLUFI_ERROR("%s make public failed %d\n", __func__, ret);
+            YCG_BLUFI_ERROR("%s make public failed %d\n", __func__, ret);
             btc_blufi_report_error(ESP_BLUFI_MAKE_PUBLIC_ERROR);
             return;
         }

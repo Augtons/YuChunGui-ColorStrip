@@ -1,5 +1,5 @@
 set(SINGLE_DIRS
-    "." "blufi" "wifi_manager"
+    "." "system" "system/blufi" "system/wifi"
 )
 
 # Tencent Cloud SDK

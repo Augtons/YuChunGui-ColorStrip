@@ -1,17 +1,21 @@
 #include <stdio.h>
-#include "esp_log.h"
 #include "esp_err.h"
 #include "esp_netif.h"
 #include "esp_event.h"
-
 #include "nvs_flash.h"
 
+#include "system.h"
+#include "system/blufi/ycg_blufi.h"
 #include "wifi_manager/wifi_manager.h"
-#include "blufi/ycg_blufi.h"
-
-#include "data_config.c"
 
 static const char* TAG = "MAIN";
+
+void tencent_cload_app();
+
+void app_start() {
+    xTaskCreate(tencent_cload_app, "tencent_cload_app", 4096, NULL, 1, NULL);
+    ESP_LOGI(TAG, "应用启动成功");
+}
 
 void app_main()
 {
@@ -27,5 +31,10 @@ void app_main()
 
     ycg_wifi_init();
     esp_blufi_set_host_name("john-xie");
+
+    ycg_ble_controller_init();
+    ycg_bluedroid_init();
     ycg_blufi_init();
+
+    app_start();
 }
