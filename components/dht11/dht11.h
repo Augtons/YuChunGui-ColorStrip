@@ -5,6 +5,10 @@
 #ifndef _DHT11_H
 #define _DHT11_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "math.h"
 #include "esp_err.h"
 #include "esp_log.h"
@@ -58,5 +62,9 @@ esp_err_t dht11_delete(dht11_handle_t dht11);
  *  - ESP_ERR_TIMEOUT       Timeout
  */
 esp_err_t dht11_read(dht11_handle_t dht11, float *temperature, float *humidity);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_DHT11_H

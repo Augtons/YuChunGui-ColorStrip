@@ -7,6 +7,10 @@
 
 #include "string.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "esp_err.h"
 #include "esp_log.h"
 #include "driver/rmt.h"
@@ -59,5 +63,9 @@ esp_err_t ws2812_rmt_init(uint8_t channel, gpio_num_t gpio);
  * @Author Augtons
  */
 esp_err_t led_strip_create_ws2812(ws2812_config_t *config, led_strip_t **ret_led_strip);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_LED_STRIP_IMPL_WS2812_H

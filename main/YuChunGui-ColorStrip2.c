@@ -6,7 +6,7 @@
 
 #include "system.h"
 #include "system/blufi/ycg_blufi.h"
-#include "wifi_manager/wifi_manager.h"
+#include "system/wifi/ycg_wifi.h"
 
 static const char* TAG = "MAIN";
 

@@ -1,14 +1,18 @@
 #ifndef _LED_STRIP_H_
 #define _LED_STRIP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
 
-typedef void * led_strip_config_t;
+typedef void *led_strip_config_t;
 
 typedef struct led_strip_func_t led_strip_t;
 
-typedef void * led_strip_dev_t;
+typedef void *led_strip_dev_t;
 
 void hsv2rgb(uint32_t h, uint32_t s, uint32_t v, uint32_t *r, uint32_t *g, uint32_t *b);
 
@@ -71,5 +75,9 @@ esp_err_t led_strip_set_color(led_strip_t *led_strip, uint32_t index, uint32_t r
  *   - Other  failed
  */
 esp_err_t led_strip_clear(led_strip_t *led_strip, TickType_t timeout);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

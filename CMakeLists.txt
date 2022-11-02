@@ -4,22 +4,11 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 
-function(FIRST_NOT_NULL OUTPUT)
-    foreach(VAL ${ARGN})
-        if (VAL)
-            set(${OUTPUT} ${VAL} PARENT_SCOPE)
-            set(FOUND 1)
-            return()
-        endif()
-    endforeach()
-    if (NOT ${FOUND})
-        message(WARNING "Not Found")
-    endif()
-endfunction()
+include(CMakeUtils.cmake)
 
-FIRST_NOT_NULL(IDF_USER_NAME "$ENV{USERNAME}" "$ENV{USER}")
+first_not_null(IDF_USER_NAME "$ENV{USERNAME}" "$ENV{USER}")
 message("Got user name `${IDF_USER_NAME}`")
-FIRST_NOT_NULL(IDF_HOST_SYSTEM "${CMAKE_SYSTEM_NAME}" "${CMAKE_HOST_SYSTEM_NAME}")
+first_not_null(IDF_HOST_SYSTEM "${CMAKE_SYSTEM_NAME}" "${CMAKE_HOST_SYSTEM_NAME}")
 message("Got system name `${IDF_HOST_SYSTEM}`")
 
 set(CMAKE_USER_PROFILE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/CMakeProfile_${IDF_USER_NAME}_${IDF_HOST_SYSTEM}.cmake)

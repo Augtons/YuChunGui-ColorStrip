@@ -5,9 +5,9 @@
 #ifndef _YCG_BLUFI_H
 #define _YCG_BLUFI_H
 
-#include "esp_bt.h"
-#include "esp_bt_main.h"
-#include "esp_bt_device.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "system.h"
 
@@ -29,5 +29,8 @@ esp_err_t ycg_ble_controller_init();
 esp_err_t ycg_bluedroid_init();
 esp_err_t ycg_blufi_init();
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif //_YCG_BLUFI_H
