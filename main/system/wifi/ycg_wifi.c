@@ -17,13 +17,13 @@ static void ycg_wifi_event_handler(void* arg, esp_event_base_t event_base,
         case WIFI_EVENT_STA_CONNECTED: {
             wifi_event_sta_connected_t *event = event_data;
             strncpy((char*)ycg_system.network.sta_config.sta.ssid, (const char*)event->ssid, 32);
+            xEventGroupSetBits(YCG_NETWORK_EVENTS, YCG_EVENT_NETWORK_WIFI_CONNECTED);
             break;
         }
         case WIFI_EVENT_STA_DISCONNECTED: {
             /* This is a workaround as ESP32 WiFi libs don't currently
                auto-reassociate. */
-            ycg_system.network.wifi_connected = false;
-
+            xEventGroupClearBits(YCG_NETWORK_EVENTS, YCG_EVENT_NETWORK_WIFI_CONNECTED);
             esp_wifi_connect();
             break;
         }
@@ -86,7 +86,11 @@ static void ycg_ip_event_handler(void* arg, esp_event_base_t event_base,
             if (ycg_system.blufi.device_connected == true) {
                 esp_blufi_send_wifi_conn_report(mode, ESP_BLUFI_STA_CONN_SUCCESS, 0, &info);
             }
-            ycg_system.network.wifi_connected = true;
+            xEventGroupSetBits(YCG_NETWORK_EVENTS, YCG_EVENT_NETWORK_IP_GOT);
+            break;
+        }
+        case IP_EVENT_STA_LOST_IP: {
+            xEventGroupClearBits(YCG_NETWORK_EVENTS, YCG_EVENT_NETWORK_IP_GOT);
             break;
         }
         default:
@@ -102,6 +106,7 @@ void ycg_wifi_init() {
 
     YCG_WIFI_INFO("WiFi Config: %s(%s)", ycg_system.network.sta_config.sta.ssid, ycg_system.network.sta_config.sta.password);
 
+    YCG_NETWORK_EVENTS = xEventGroupCreate();
     ycg_system.network.wifi_inited = true;
 
     if (ycg_system.network.netif_sta == NULL) {

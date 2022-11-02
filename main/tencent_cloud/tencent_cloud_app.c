@@ -25,11 +25,8 @@ void tencent_cload_app() {
 
     HAL_GetDevInfo(&deviceInfo);
 
-    while (ycg_system.network.wifi_connected) {
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    /* Wait for Wi-Fi connecting. */
+    xEventGroupWaitBits(YCG_NETWORK_EVENTS, YCG_EVENT_NETWORK_IP_GOT, false, true, portMAX_DELAY);
 
     TemplateInitParams params = DEFAULT_TEMPLATE_INIT_PARAMS;
     params.region = deviceInfo.region;

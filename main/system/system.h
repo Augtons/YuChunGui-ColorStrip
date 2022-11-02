@@ -35,7 +35,7 @@ struct system_t {
     // network
     struct network_t {
         bool wifi_inited;
-        bool wifi_connected;
+        EventGroupHandle_t event;
 
         esp_event_handler_instance_t wifi_event_handler_ins;
         esp_event_handler_instance_t ip_event_handler_ins;
@@ -43,18 +43,28 @@ struct system_t {
         esp_netif_t *netif_sta;
         wifi_config_t sta_config;
 
-
     } network;
 
     // blufi
     struct blufi_t {
         bool device_connected;
 
+        EventGroupHandle_t event;
+
     } blufi;
 
 };
 
 extern struct system_t ycg_system;
+
+/* YCG Network events */
+#define YCG_NETWORK_EVENTS                  (ycg_system.network.event)
+
+#define YCG_EVENT_NETWORK_WIFI_CONNECTED    BIT(0)
+#define YCG_EVENT_NETWORK_IP_GOT            BIT(1)
+
+/* YCG Blufi events */
+#define YCG_BLUFI_EVENTS                (ycg_system.blufi.event)
 
 #ifdef __cplusplus
 }

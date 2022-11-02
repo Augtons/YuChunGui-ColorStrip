@@ -63,6 +63,8 @@ esp_err_t ycg_blufi_init()
 {
     esp_err_t ret = ESP_OK;
 
+    YCG_BLUFI_EVENTS = xEventGroupCreate();
+
     ret = esp_blufi_register_callbacks(&example_callbacks);
     if (ret != ESP_OK) {
         YCG_BLUFI_ERROR("Blufi回调注册失败");

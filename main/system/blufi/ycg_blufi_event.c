@@ -66,7 +66,8 @@ void ycg_blufi_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_param_t *
             esp_blufi_extra_info_t info = {0};
             esp_wifi_get_mode(&mode);
 
-            if (ycg_system.network.wifi_connected) {
+            EventBits_t bits = xEventGroupWaitBits(YCG_NETWORK_EVENTS, YCG_EVENT_NETWORK_WIFI_CONNECTED, false, true, 0);
+            if (bits & YCG_EVENT_NETWORK_WIFI_CONNECTED) {
                 memcpy(info.sta_bssid, ycg_system.network.sta_config.sta.bssid, 6);
                 info.sta_bssid_set = true;
 
