@@ -31,7 +31,6 @@ struct ws2812_strip_t {
 
 struct ws2812_config_t {
     rmt_channel_t   rmt_channel; /* RMT channel for the strip */
-    gpio_num_t      gpio;        /* GPIO which connected to the strip. */
     uint32_t        led_num;     /* Count of LEDs. Determines how much memory to be allocated. */
 };
 
