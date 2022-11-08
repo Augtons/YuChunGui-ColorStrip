@@ -7,15 +7,7 @@
 
 static sDataPoint    sg_DataTemplate[TOTAL_PROPERTY_COUNT];
 
-typedef struct _ProductDataDefine {
-    TYPE_DEF_TEMPLATE_BOOL m_power_switch;
-    TYPE_DEF_TEMPLATE_INT m_brightness;
-    TYPE_DEF_TEMPLATE_STRING m_color_value[2048+1];
-    TYPE_DEF_TEMPLATE_FLOAT m_temp;
-    TYPE_DEF_TEMPLATE_INT m_humi;
-} ProductDataDefine;
-
-static   ProductDataDefine     sg_ProductData;
+ProductDataDefine     sg_ProductData;
 
 static void _init_data_template(void)
 {

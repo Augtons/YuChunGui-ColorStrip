@@ -12,6 +12,7 @@ set(TENCENT_CLOUD_INCLUDE
 )
 
 set(TENCENT_CLOUD_SRCS
+    "."
     "tencent_cloud"
     "tencent_cloud/platform"
     "tencent_cloud/sdk_src"

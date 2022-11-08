@@ -10,10 +10,12 @@
 
 static const char* TAG = "MAIN";
 
-void tencent_cload_app();
+_Noreturn void tencent_cload_app(void *arg);
+_Noreturn void system_moniter(void *arg);
 
 void app_start() {
     xTaskCreate(tencent_cload_app, "tencent_cload_app", 4096, NULL, 1, NULL);
+    //xTaskCreate(system_moniter, "system_moniter", 2048, NULL, 5, NULL);
     ESP_LOGI(TAG, "应用启动成功");
 }
 
@@ -37,4 +39,13 @@ void app_main()
     ycg_blufi_init();
 
     app_start();
+}
+
+static char str[512] = {0};
+_Noreturn void system_moniter(void *arg) {
+    while (1) {
+        vTaskList(str);
+        printf("%s", str);
+        vTaskDelay(pdMS_TO_TICKS(10000));
+    }
 }
