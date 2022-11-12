@@ -16,7 +16,7 @@ Object-oriented design is used. Support for ESP-IDF 4.4.x now.
 
 static const char *TAG = "MAIN"; 
 
-// 1. Declare a LED strip object.
+// 1. Declare a DHT11 sensor object.
 dht11_handle_t dht11 = NULL;
 
 void app_main() {
