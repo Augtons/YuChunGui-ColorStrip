@@ -13,6 +13,23 @@ static const char* TAG = "MAIN";
 _Noreturn void tencent_cload_app(void *arg);
 _Noreturn void system_moniter(void *arg);
 
+void init_devices() {
+    // Create DHT11 Instance.
+    YCG_CreateInstance( "DHT11",
+        dht11_create(GPIO_NUM_6, &ycg_system.devices.dht11);
+    );
+
+    ws2812_rmt_init(RMT_CHANNEL_0, GPIO_NUM_7);
+    YCG_CreateInstance( "WS2812",
+        led_strip_create_ws2812(&(ws2812_config_t) {
+            .rmt_channel = RMT_CHANNEL_0,
+            .led_num = LED_NUMS
+        }, &ycg_system.devices.ledStrip)
+    )
+
+    led_strip_clear(ycg_system.devices.ledStrip, pdMS_TO_TICKS(100));
+}
+
 void app_start() {
     xTaskCreate(tencent_cload_app, "tencent_cload_app", 4096, NULL, 1, NULL);
     //xTaskCreate(system_moniter, "system_moniter", 2048, NULL, 5, NULL);
@@ -31,6 +48,8 @@ void app_main()
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
+    init_devices();
+
     ycg_wifi_init();
     esp_blufi_set_host_name("john-xie");
 
@@ -43,7 +62,7 @@ void app_main()
 
 static char str[512] = {0};
 _Noreturn void system_moniter(void *arg) {
-    while (1) {
+    loop {
         vTaskList(str);
         printf("%s", str);
         vTaskDelay(pdMS_TO_TICKS(10000));

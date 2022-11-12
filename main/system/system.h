@@ -31,6 +31,10 @@ extern "C" {
 #include "ycg_wifi.h"
 #include "ycg_blufi.h"
 
+#include "dht11.h"
+#include "led_strip_impl_ws2812.h"
+#include "led_strip.h"
+
 struct system_t {
     // network
     struct network_t {
@@ -53,9 +57,28 @@ struct system_t {
 
     } blufi;
 
+    //dev
+    struct devices_t {
+        led_strip_t *ledStrip;
+        dht11_handle_t dht11;
+    } devices;
+
 };
 
 extern struct system_t ycg_system;
+
+/* Device */
+#define LED_NUMS (60)
+
+#define YCG_CreateInstance(name, code)                              \
+{                                                                   \
+    esp_err_t __err = code;                                                         \
+    if (__err == ESP_OK) {                                                \
+        ESP_LOGI(TAG, "创建" #name "实例成功");                               \
+    } else {                                                            \
+        ESP_LOGE(TAG, "创建" #name "示例失败, 错误: %s", esp_err_to_name(__err)); \
+    }                                                                   \
+}
 
 /* YCG Network events */
 #define YCG_NETWORK_EVENTS                  (ycg_system.network.event)
@@ -65,6 +88,14 @@ extern struct system_t ycg_system;
 
 /* YCG Blufi events */
 #define YCG_BLUFI_EVENTS                (ycg_system.blufi.event)
+
+/* Language extensions*/
+#define loop for(;;)
+
+#define synchronized(lock, block)  if(xSemaphoreTake((lock), portMAX_DELAY)) { \
+    block;                                                                     \
+    xSemaphoreGive((lock));                                                    \
+}
 
 #ifdef __cplusplus
 }
