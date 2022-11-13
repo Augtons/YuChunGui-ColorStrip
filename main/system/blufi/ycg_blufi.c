@@ -6,7 +6,7 @@
 
 static const char *TAG = "YCG_BLUFI";
 
-static esp_blufi_callbacks_t example_callbacks = {
+static esp_blufi_callbacks_t ycg_blufi_callbacks = {
     .event_cb = ycg_blufi_event_callback,
     .negotiate_data_handler = blufi_dh_negotiate_data_handler,
     .encrypt_func = blufi_aes_encrypt,
@@ -65,7 +65,7 @@ esp_err_t ycg_blufi_init()
 
     YCG_BLUFI_EVENTS = xEventGroupCreate();
 
-    ret = esp_blufi_register_callbacks(&example_callbacks);
+    ret = esp_blufi_register_callbacks(&ycg_blufi_callbacks);
     if (ret != ESP_OK) {
         YCG_BLUFI_ERROR("Blufi回调注册失败");
         return ret;

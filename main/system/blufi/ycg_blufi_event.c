@@ -126,6 +126,7 @@ void ycg_blufi_event_callback(esp_blufi_cb_event_t event, esp_blufi_cb_param_t *
         case ESP_BLUFI_EVENT_RECV_CUSTOM_DATA: {
             YCG_BLUFI_INFO("接收到自定义数据，长度: %d\n", param->custom_data.data_len);
             esp_log_buffer_hex("Custom Data", param->custom_data.data, param->custom_data.data_len);
+            on_blufi_custom_data_receive(param->custom_data.data, param->custom_data.data_len);
             break;
         }
         case ESP_BLUFI_EVENT_RECV_USERNAME:

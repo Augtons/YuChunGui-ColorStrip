@@ -97,6 +97,7 @@ _Noreturn void qcloud_update(void *arg) {
         })
 
 continue_tag:
+        xSemaphoreGive(ycg_data_lock);
         xTaskNotifyStateClear(current);
     }
 }

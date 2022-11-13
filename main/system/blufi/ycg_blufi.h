@@ -29,6 +29,8 @@ esp_err_t ycg_ble_controller_init();
 esp_err_t ycg_bluedroid_init();
 esp_err_t ycg_blufi_init();
 
+void on_blufi_custom_data_receive(uint8_t *data, uint32_t len);
+
 #ifdef __cplusplus
 }
 #endif

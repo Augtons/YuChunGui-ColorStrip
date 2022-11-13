@@ -32,7 +32,7 @@ void init_devices() {
 
 void app_start() {
     xTaskCreate(tencent_cload_app, "tencent_cload_app", 4096, NULL, 1, NULL);
-    //xTaskCreate(system_moniter, "system_moniter", 2048, NULL, 5, NULL);
+    xTaskCreate(system_moniter, "system_moniter", 2048, NULL, 5, NULL);
     ESP_LOGI(TAG, "应用启动成功");
 }
 

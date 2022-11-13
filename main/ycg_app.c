@@ -36,6 +36,13 @@ _Noreturn void ycg_app(void *arg) {
     }
 }
 
+void on_blufi_custom_data_receive(uint8_t *data, uint32_t len) {
+    if (memcmp(data, "reboot", len) == 0) {
+        ESP_LOGI(TAG, "RESTART");
+        esp_restart();
+    }
+}
+
 static inline void led_strip_display_single(float r, float g, float b, float brightness) {
     for (int i = 0; i < LED_NUMS; i++) {
         led_strip_set_color(ledStrip, i,
@@ -85,6 +92,7 @@ _Noreturn void led_strip_display(void *arg) {
     uint8_t red = 0, green = 0, blue = 0;
     float brightness = 0;
     bool updated = true;
+
     loop {
         if (ulTaskNotifyTake(true, 0)) {
             updated = true;
