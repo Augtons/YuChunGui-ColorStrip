@@ -58,9 +58,9 @@ static inline void led_strip_display_flow(float r, float g, float b, float brigh
     static int step = 0; // [0, 19]
     for (int i = 0; i < LED_NUMS; i++) {
         float step_brightness;
-        int temp = (i + step) % 10;
-        if (temp <= 6) {
-            step_brightness = brightness * temp / 6.0F;
+        int temp = (i + step) % 20;
+        if (temp <= 15) {
+            step_brightness = brightness * (15.0F - temp) / 15.0F;
         } else {
             step_brightness = 0;
         }
@@ -101,7 +101,7 @@ _Noreturn void led_strip_display(void *arg) {
                 red = sg_ProductData.m_color_red;
                 green = sg_ProductData.m_color_green;
                 blue = sg_ProductData.m_color_blue;
-                brightness = sg_ProductData.m_brightness / 20.0F;
+                brightness = sg_ProductData.m_brightness / 16.0F;
             })
         }
         switch (mode) {
